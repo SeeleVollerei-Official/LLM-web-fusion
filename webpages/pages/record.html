@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记录支出 - 个人财务管理系统</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .record-form {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: #40a9ff;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+
+        .file-input {
+            margin-bottom: 10px;
+        }
+
+        .upload-btn {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .upload-btn:hover {
+            background: #40a9ff;
+        }
+
+        .upload-status {
+            margin-top: 8px;
+            color: #666;
+        }
+
+        /* 文件上传成功状态 */
+        .upload-success {
+            color: #52c41a;
+        }
+
+        /* 文件上传失败状态 */
+        .upload-error {
+            color: #f5222d;
+        }
+
+        .input-method-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .method-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #1890ff;
+            background: white;
+            color: #1890ff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .method-btn.active {
+            background: #1890ff;
+            color: white;
+        }
+
+        .input-form {
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <a href="../index.html" class="back-btn">← 返回首页</a>
+        
+        <div class="record-form">
+            <h2>记录支出</h2>
+            
+            <!-- 添加输入方式选择 -->
+            <div class="input-method-selector">
+                <button class="method-btn active" onclick="switchMethod('manual')">手动输入</button>
+                <button class="method-btn" onclick="switchMethod('image')">图片识别</button>
+            </div>
+
+            <!-- 手动输入表单 -->
+            <form id="manualForm" class="input-form">
+                <div class="form-group">
+                    <label for="category">支出类型</label>
+                    <select id="category" required>
+                        <option value="">请选择类型</option>
+                        <option value="food">餐饮</option>
+                        <option value="transport">交通</option>
+                        <option value="entertainment">娱乐</option>
+                        <option value="shopping">购物</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">金额</label>
+                    <input type="number" id="amount" required placeholder="请输入支出金额">
+                </div>
+
+                <div class="form-group">
+                    <label for="date">日期</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="submit-btn">提交</button>
+                </div>
+            </form>
+
+            <!-- 图片识别表单 -->
+            <form id="imageForm" class="input-form" style="display: none;">
+                <div class="form-group">
+                    <label for="receipt">上传收据图片</label>
+                    <input type="file" id="receipt" accept="image/*" class="file-input" required>
+                    <button type="button" onclick="uploadReceipt()" class="upload-btn">上传并识别</button>
+                </div>
+                <div id="uploadStatus" class="upload-status"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function switchMethod(method) {
+        // 更新按钮状态
+        document.querySelectorAll('.method-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // 切换表单显示
+        if (method === 'manual') {
+            document.getElementById('manualForm').style.display = 'block';
+            document.getElementById('imageForm').style.display = 'none';
+        } else {
+            document.getElementById('manualForm').style.display = 'none';
+            document.getElementById('imageForm').style.display = 'block';
+        }
+    }
+
+    async function uploadReceipt() {
+        const fileInput = document.getElementById('receipt');
+        const statusDiv = document.getElementById('uploadStatus');
+        
+        if (!fileInput.files || fileInput.files.length === 0) {
+            statusDiv.textContent = '请选择要上传的图片';
+            statusDiv.className = 'upload-status upload-error';
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            statusDiv.textContent = '正在上传并识别...';
+            statusDiv.className = 'upload-status';
+
+            const response = await fetch('http://localhost:5000/api/record/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('上传失败');
+            }
+
+            const result = await response.json();
+            
+            if (result.message === 'Success') {
+                statusDiv.textContent = '识别成功！';
+                statusDiv.className = 'upload-status upload-success';
+                // TODO: 处理识别结果
+            } else {
+                throw new Error(result.error || '识别失败');
+            }
+
+        } catch (error) {
+            console.error('上传失败:', error);
+            statusDiv.textContent = '上传或识别失败，请重试';
+            statusDiv.className = 'upload-status upload-error';
+        }
+    }
+    </script>
+</body>
+</html> 

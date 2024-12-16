@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人财务管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div class="home-container">
+        <!-- 用户信息区域 -->
+        <div class="user-profile">
+            <div class="user-info">
+                <img src="https://placekitten.com/100/100" alt="用户头像">
+                <h2>张三</h2>
+                <p>账户余额：¥<span id="accountBalance">0</span></p>
+                <p>月收入：¥<span id="monthlyIncome">0</span></p>
+            </div>
+            <div class="account-info">
+                <p>本月节约目标：¥<span id="monthSavingTarget">0</span></p>
+                <p>上月节约金额：¥<span id="lastMonthSaving">0</span>，
+                    <span id="targetStatus">计算中...</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- 消费概况卡片 -->
+        <div class="expense-overview">
+            <div class="chart-card">
+                <h3>消费分类占比</h3>
+                <div id="pieChart" style="width: 100%; height: 300px;"></div>
+            </div>
+            <div class="summary-card">
+                <h3>本月消费概要</h3>
+                <p id="totalExpense">当月消费总额: ¥0</p>
+                <div class="recommendations">
+                    <h4>支出建议</h4>
+                    <ul>
+                        <li>娱乐支出偏高，建议适当控制</li>
+                        <li>餐饮支出合理，继续保持</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷操作按钮 -->
+        <div class="quick-actions">
+            <a href="pages/record.html" class="action-button">
+                <span class="button-text">记录支出</span>
+            </a>
+            <a href="pages/history.html" class="action-button">
+                <span class="button-text">查看记录</span>
+            </a>
+            <a href="pages/analysis.html" class="action-button">
+                <span class="button-text">消费分析</span>
+            </a>
+            <a href="pages/recommend.html" class="action-button">
+                <span class="button-text">兴趣推荐</span>
+            </a>
+        </div>
+
+        <!-- 设置菜单 -->
+        <div class="settings-menu">
+            <a href="pages/profile.html">个人资料</a>
+            <a href="pages/settings.html">系统设置</a>
+            <a href="pages/help.html">帮助中心</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // 页面加载时获取消费分类数据
+        async function fetchCategoryData() {
+            try {
+                const response = await fetch('http://localhost:5000/api/index/categories');
+                if (!response.ok) {
+                    throw new Error('获取数据失败');
+                }
+                const data = await response.json();
+
+                // 直接使用后端计算的total
+                document.getElementById('totalExpense').textContent = 
+                    `当月消费总额: ¥${data.total.toFixed(2)}`;
+
+                // 更新图表数据
+                const chart = echarts.init(document.getElementById('pieChart'));
+                const option = {
+                    title: {
+                        text: '消费分类占比',
+                        left: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}: ¥{c} ({d}%)'
+                    },
+                    series: [
+                        {
+                            name: '消费分类',
+                            type: 'pie',
+                            radius: '50%',
+                            data: [
+                                { value: data.food, name: '餐饮' },
+                                { value: data.entertainment, name: '娱乐' },
+                                { value: data.transport, name: '交通' },
+                                { value: data.shopping, name: '购物' },
+                                { value: data.other, name: '其他' }
+                            ],
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                chart.setOption(option);
+            } catch (error) {
+                console.error('获取消费分类数据失败:', error);
+                alert('获取消费分类数据失败，请稍后重试');
+            }
+        }
+
+        // 获取主页面信息
+        async function fetchMainInfo() {
+            try {
+                const response = await fetch('http://localhost:5000/api/index/mainInfo');
+                if (!response.ok) {
+                    throw new Error('获取数据失败');
+                }
+                const data = await response.json();
+                
+                // 更新用户名
+                document.querySelector('.user-info h2').textContent = data.username;
+                
+                // 更新账户余额和月收入
+                document.getElementById('accountBalance').textContent = 
+                    data.savings.toFixed(2);
+                document.getElementById('monthlyIncome').textContent = 
+                    data.income.toFixed(2);
+                
+                // 更新节约目标和上月节约金额
+                document.getElementById('monthSavingTarget').textContent = 
+                    data.goal.toFixed(2);
+                document.getElementById('lastMonthSaving').textContent = 
+                    data.lastMonthSavings.toFixed(2);
+                
+                // 更新目标达成状态
+                const targetStatus = document.getElementById('targetStatus');
+                if (data.isAchieved) {
+                    targetStatus.textContent = '已达成目标';
+                    targetStatus.style.color = '#52c41a'; // 绿色
+                } else {
+                    targetStatus.textContent = '未达成目标';
+                    targetStatus.style.color = '#f5222d'; // 红色
+                }
+            } catch (error) {
+                console.error('获取主页面信息失败:', error);
+            }
+        }
+
+        // 页面加载时调用
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchMainInfo();     // 获取主页面信息
+            fetchCategoryData(); // 获取消费分类数据
+        });
+    </script>
+</body>
+</html> 

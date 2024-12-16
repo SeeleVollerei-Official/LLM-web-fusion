@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 个人财务管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 {
+            color: #1890ff;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #40a9ff;
+        }
+
+        .form-footer {
+            margin-top: 24px;
+            text-align: center;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: #1890ff;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff4d4f;
+            font-size: 14px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #d9d9d9;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #666;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #1890ff;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #1890ff;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forgot-password {
+            color: #1890ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>个人财务管理系统</h1>
+            <p>科学理财，轻松生活</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('login')">登录</div>
+                <div class="tab" onclick="switchTab('register')">注册</div>
+            </div>
+
+            <!-- 登录表单 -->
+            <div class="form-content active" id="loginForm">
+                <form onsubmit="return handleLogin(event)">
+                    <div class="form-group">
+                        <label for="loginUsername">用户名</label>
+                        <input type="text" id="loginUsername" required>
+                        <div class="error-message">请输入用户名</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">密码</label>
+                        <input type="password" id="loginPassword" required>
+                        <div class="error-message">请输入密码</div>
+                    </div>
+
+                    <div class="remember-forgot">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>记住我</span>
+                        </label>
+                        <a href="#" class="forgot-password">忘记密码？</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn">登录</button>
+                </form>
+            </div>
+
+            <!-- 注册表单 -->
+            <div class="form-content" id="registerForm">
+                <form onsubmit="return handleRegister(event)">
+                    <div class="form-group">
+                        <label for="registerUsername">用户名</label>
+                        <input type="text" id="registerUsername" required>
+                        <div class="error-message">请输入用户名</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerEmail">邮箱</label>
+                        <input type="email" id="registerEmail" required>
+                        <div class="error-message">请输入有效的邮箱地址</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPassword">密码</label>
+                        <input type="password" id="registerPassword" required>
+                        <div class="error-message">密码至少包含6个字符</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">确认密码</label>
+                        <input type="password" id="confirmPassword" required>
+                        <div class="error-message">两次输入的密码不一致</div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">注册</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            // 切换标签样式
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 切换表单显示
+            document.querySelectorAll('.form-content').forEach(f => f.classList.remove('active'));
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // 登录成功
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    // 登录失败
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('登录失败，请稍后重试');
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致！');
+                return;
+            }
+            try {
+                const response = await fetch('http://localhost:5000/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('注册成功！请登录');
+                    switchTab('login');
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('注册失败，请稍后重试');
+            }
+        }
+    </script>
+</body>
+</html> 
+
+
+
+
+
+
+
+
+
+
+

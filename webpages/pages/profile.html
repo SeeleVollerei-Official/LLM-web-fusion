@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - 个人财务管理系统</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .profile-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .avatar-section {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .avatar-section img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 12px;
+        }
+
+        .upload-btn {
+            background: #f0f0f0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .save-btn {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .save-btn:hover {
+            background: #40a9ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <a href="../index.html" class="back-btn">← 返回首页</a>
+        
+        <div class="profile-container">
+            <h2>个人资料</h2>
+            
+            <div class="avatar-section">
+                <img src="https://placekitten.com/120/120" alt="用户头像">
+                <button class="upload-btn">更换头像</button>
+            </div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" value="张三" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" value="zhangsan@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">手机号码</label>
+                    <input type="tel" id="phone" value="13800138000">
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyIncome">月收入</label>
+                    <input type="number" id="monthlyIncome" value="15000">
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyBudget">月度预算</label>
+                    <input type="number" id="monthlyBudget" value="10000">
+                </div>
+
+                <button type="submit" class="save-btn">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时从数据库获取用户信息
+        async function fetchUserProfile() {
+            try {
+                const response = await fetch('http://localhost:5000/api/profile');
+                if (!response.ok) {
+                    throw new Error('获取数据失败');
+                }
+                const userData = await response.json();
+                
+                // 确保从数据库获取的数据填充到表单中
+                if (userData) {
+                    document.getElementById('username').value = userData.username || '';
+                    document.getElementById('email').value = userData.email || '';
+                    document.getElementById('phone').value = userData.phone || '';
+                    document.getElementById('monthlyIncome').value = userData.monthlyIncome || '';
+                    document.getElementById('monthlyBudget').value = userData.monthlyBudget || '';
+                }
+            } catch (error) {
+                console.error('获取用户信息失败:', error);
+                alert('获取用户信息失败，请稍后重试');
+            }
+        }
+
+        // 页面加载时立即调用获取数据函数
+        window.addEventListener('DOMContentLoaded', fetchUserProfile);
+
+        // 处理表单提交
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                monthlyIncome: document.getElementById('monthlyIncome').value,
+                monthlyBudget: document.getElementById('monthlyBudget').value
+            };
+
+            try {
+                const response = await fetch('/api/profile/modification', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert('个人资料更新成功！');
+                    // 更新成功后重新获取最新数据
+                    await fetchUserProfile();
+                } else {
+                    throw new Error('更新失败');
+                }
+            } catch (error) {
+                console.error('更新个人资料失败:', error);
+                alert('更新个人资料失败，请稍后重试');
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查看记录 - 个人财务管理系统</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .history-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px auto;
+        }
+
+        .filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .filters select, .filters input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .filters select {
+            width: 150px;
+        }
+
+        .filters button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th, .history-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .history-table th {
+            background-color: #f8f9fa;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <a href="../index.html" class="back-btn">← 返回首页</a>
+        
+        <div class="history-container">
+            <h2>查看记录</h2>
+            <div class="filters">
+                <select id="monthFilter">
+                    <option value="">所有月份</option>
+                    <option value="1">1月</option>
+                    <option value="2">2月</option>
+                    <option value="3">3月</option>
+                    <option value="4">4月</option>
+                    <option value="5">5月</option>
+                    <option value="6">6月</option>
+                    <option value="7">7月</option>
+                    <option value="8">8月</option>
+                    <option value="9">9月</option>
+                    <option value="10">10月</option>
+                    <option value="11">11月</option>
+                    <option value="12">12月</option>
+                </select>
+                <button onclick="applyFilters()">应用过滤条件</button>
+            </div>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>金额</th>
+                        <th>日期</th>
+                        <th>内容</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsTableBody">
+                    <!-- 这里动态添加记录数据 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function applyFilters() {
+            const monthFilter = document.getElementById('monthFilter').value;
+
+            fetch('http://localhost:5000/api/records', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ month: parseInt(monthFilter) || null }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('recordsTableBody');
+                tableBody.innerHTML = '';
+
+                data.forEach(record => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${record.category}</td>
+                        <td>${record.amount}</td>
+                        <td>${record.time}</td>
+                        <td>${record.content}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('请求失败:', error);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帮助中心 - 个人财务管理系统</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .help-container {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        .faq-section {
+            margin-bottom: 32px;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            font-weight: bold;
+            color: #1890ff;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .faq-answer {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .contact-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 32px;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+        }
+
+        .contact-item {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <a href="../index.html" class="back-btn">← 返回首页</a>
+        
+        <div class="help-container">
+            <h2>帮助中心</h2>
+            
+            <div class="faq-section">
+                <h3>常见问题</h3>
+                
+                <div class="faq-item">
+                    <div class="faq-question">如何记录日常支出？</div>
+                    <div class="faq-answer">
+                        点击首页的"记录支出"按钮，选择支出类型，输入金额和备注信息即可完成记录。
+                        您也可以通过上传截图或语音方式快速记录支出。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">如何设置月度预算？</div>
+                    <div class="faq-answer">
+                        在个人资料页面中，您可以设置月度预算金额。系统会根据您的预算自动计算使用情况，
+                        并在接近预算限额时发出提醒。
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">如何查看消费分析报告？</div>
+                    <div class="faq-answer">
+                        点击首页的"消费分析"按钮，系统会为您生成详细的消费分析报告，
+                        包括消费趋势、分类统计等信息。
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-section">
+                <h3>联系我们</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h4>客服电话</h4>
+                        <p>400-123-4567</p>
+                    </div>
+                    <div class="contact-item">
+                        <h4>客服邮箱</h4>
+                        <p>support@example.com</p>
+                    </div>
+                    <div class="contact-item">
+                        <h4>工作时间</h4>
+                        <p>周一至周五 9:00-18:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 点击问题展开/收起答案
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                answer.style.display = answer.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html> 
